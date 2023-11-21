@@ -1,6 +1,5 @@
 -- TODO: wrap in a autocmd SpellFileMissing
 
--- public API
 local M = {}
 M.config = { url = "https://ftp.nluug.nl/pub/vim/runtime/spell" }
 M.done = {}
@@ -20,6 +19,17 @@ M.load_file = function(lang)
 	end
 
 	M.done[code] = true
+end
+
+M.directory_choices = function()
+	local options = {}
+	for _, dir in ipairs(vim.opt.rtp:get()) do
+		local spell = dir .. "/spell"
+		if vim.fn.isdirectory(spell) == 1 then
+			table.insert(options, spell)
+		end
+	end
+	return options
 end
 
 return M
