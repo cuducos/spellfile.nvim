@@ -3,68 +3,23 @@
 -- public API
 local M = {}
 M.config = { url = "https://ftp.nluug.nl/pub/vim/runtime/spell" }
+M.done = {}
 
 M.setup = function(opts)
 	M.config = vim.tbl_extend("force", M.config, opts or {})
+	M.done = {}
+end
+
+M.load_file = function(lang)
+	local code = lang:lower()
+	for key, _ in pairs(M.done) do
+		if key == code then
+			vim.notify("Already tried this language before: " .. code)
+			return
+		end
+	end
+
+	M.done[code] = true
 end
 
 return M
-
--- original spellfile.vim for reference
-
--- -- Vim script to download a missing spell file
-
--- vim.g.spellfile_URL = vim.g.spellfile_URL or 'https://ftp.nluug.nl/pub/vim/runtime/spell'
--- local spellfile_URL = ''
-
--- -- This function is used for the spellfile plugin.
--- local function LoadFile(lang)
---   -- Check for sandbox/modeline. #11359
---   pcall(vim.cmd, '!')
-
---   -- If the netrw plugin isn't loaded we silently skip everything.
---   if not vim.fn.exists(":Nread") then
---     if vim.o.verbose then
---       print('spellfile#LoadFile(): Nread command is not available.')
---     end
---     return
---   end
---   lang = lang:lower()
-
---   -- If the URL changes we try all files again.
---   if spellfile_URL ~= vim.g.spellfile_URL then
---     donedict = {}
---     spellfile_URL = vim.g.spellfile_URL
---   end
-
---   -- I will say this only once!
---   if donedict[lang .. vim.o.enc] then
---     if vim.o.verbose then
---       print('spellfile#LoadFile(): Tried this language/encoding before.')
---     end
---     return
---   end
---   donedict[lang .. vim.o.enc] = 1
-
---   -- Find spell directories we can write in.
---   local dirlist, dirchoices = spellfile#GetDirChoices()
---   if #dirlist == 0 then
---     local dir_to_create = spellfile#WritableSpellDir()
---     if vim.o.verbose or dir_to_create ~= '' then
---       print('spellfile#LoadFile(): No (writable) spell directory found.')
---     end
---     if dir_to_create ~= '' then
---       vim.fn.mkdir(dir_to_create, "p")
---       -- Now it should show up in the list.
---       dirlist, dirchoices = spellfile#GetDirChoices()
---     end
---     if #dirlist == 0 then
---       print('Failed to create: '..dir_to_create)
---       return
---     else
---       print('Created '..dir_to_create)
---     end
---   end
-
---   -- Rest of the code...
--- end
