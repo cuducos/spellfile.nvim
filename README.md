@@ -1,4 +1,4 @@
-# `spellfile.nvim` — a work in progress
+# `spellfile.nvim` — a work in progress [![Tests](https://github.com/cuducos/spellfile.nvim/actions/workflows/tests.yml/badge.svg)](https://github.com/cuducos/spellfile.nvim/actions/workflows/tests.yml) [![StyLua](https://github.com/cuducos/spellfile.nvim/actions/workflows/stylua.yml/badge.svg)](https://github.com/cuducos/spellfile.nvim/actions/workflows/stylua.yml)
 
 It looks like that nice feature of Vim/Neovim depends entirely on `netwr`:
 * There's [an issue on Neovim](https://github.com/neovim/neovim/issues/7189)
