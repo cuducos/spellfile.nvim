@@ -9,6 +9,7 @@ Native `spellfile.vim` works [using a `SpellFileMissing` auto command](https://g
 * uses the same `autocmd` for seamless integration
 
 ## Tests
+
 ```console
-$ nvim --headless --noplugin -u tests/minimal.lua -c "PlenaryBustedDirectory tests/ {minimal_init = 'tests/minimal.lua'}"
+$ nvim --headless -u tests/init.lua -c "PlenaryBustedDirectory tests/ { minimal_init = 'tests/init.lua' }"
 ```
