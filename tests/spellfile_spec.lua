@@ -1,11 +1,11 @@
 describe("Setup", function()
 	it("loads with default config", function()
-		local spellfile = require("spellfile.nvim")
+		local spellfile = require("spellfile_nvim")
 		assert.are.same(spellfile.config.url, "https://ftp.nluug.nl/pub/vim/runtime/spell")
 	end)
 
 	it("loads with custom config", function()
-		local spellfile = require("spellfile.nvim")
+		local spellfile = require("spellfile_nvim")
 		spellfile.setup({ url = "42" })
 		assert.are.same(spellfile.config.url, "42")
 	end)

@@ -1,5 +1,5 @@
 -- install spellfile.nvim
-vim.opt.rtp:append(".")
+vim.opt.rtp:append(vim.fn.expand("."))
 vim.cmd("runtime plugin/spellfile.nvim")
 
 -- install plenary to run test
