@@ -1,26 +1,25 @@
 -- TODO: wrap in a autocmd SpellFileMissing
 
--- config
-local default_config = { url =  'https://ftp.nluug.nl/pub/vim/runtime/spell' }
-local config = default_config
-
+-- defaults
+local config = { url = "https://ftp.nluug.nl/pub/vim/runtime/spell" }
 
 -- public API
 local M
 
 M.setup = function(opts)
-    if opts ~= nil then
-        for key, _ in pairs(default_config) do
-            if opts[key] ~= nil then
-                config[key] = opts[key]
-            else
-                config[key] = default_config[key]
-            end
-        end
-    end
+	if opts ~= nil then
+		for key, _ in pairs(config) do
+			if opts[key] ~= nil then
+				M.config[key] = opts[key]
+			else
+				M.config[key] = config[key]
+			end
+		end
+	end
 end
 
-M.setup(default_config)
+M.config = {}
+M.setup()
 
 return M
 
