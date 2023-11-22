@@ -1,8 +1,10 @@
 local M = {}
+
 M.config = {
 	url = "https://ftp.nluug.nl/pub/vim/runtime/spell",
 	encoding = "utf-8",
 }
+
 M.done = {}
 
 M.setup = function(opts)
@@ -30,6 +32,17 @@ M.file_name = function(lang)
 		encoding = "latin1"
 	end
 	return lang:lower() .. "." .. encoding .. ".spl"
+end
+
+M.exists = function(lang)
+	local pth = M.file_name(lang)
+	for _, dir in pairs(M.directory_choices()) do
+		local stat = vim.loop.fs_stat(dir .. "/" .. pth)
+		if stat.type == "file" then
+			return true
+		end
+	end
+	return false
 end
 
 M.load_file = function(lang)

@@ -47,3 +47,7 @@ describe("File name", function()
 		assert.are.same(file_name, "en.utf-8.spl")
 	end)
 end)
+
+describe("Exists function", function()
+	-- TODO: how to mock the return value of vim.loop.fs_stat?
+end)
