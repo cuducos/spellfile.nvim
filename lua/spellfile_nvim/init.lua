@@ -1,3 +1,5 @@
+local path = require("spellfile_nvim.path")
+
 local M = {}
 
 M.config = {
@@ -35,10 +37,9 @@ M.file_name = function(lang)
 end
 
 M.exists = function(lang)
-	local pth = M.file_name(lang)
+	local name = M.file_name(lang)
 	for _, dir in pairs(M.directory_choices()) do
-		local stat = vim.loop.fs_stat(dir .. "/" .. pth)
-		if stat.type == "file" then
+		if path.is_file(dir .. "/" .. name) then
 			return true
 		end
 	end

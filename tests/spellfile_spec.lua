@@ -49,5 +49,23 @@ describe("File name", function()
 end)
 
 describe("Exists function", function()
-	-- TODO: how to mock the return value of vim.loop.fs_stat?
+	it("returns true when the spell file exists", function()
+		local path = require("spellfile_nvim.path")
+		path.is_file = function()
+			return true
+		end
+
+		local spellfile = require("spellfile_nvim")
+		assert.is_true(spellfile.exists("en"))
+	end)
+
+	it("returns false when the spell file exists", function()
+		local path = require("spellfile_nvim.path")
+		path.is_file = function()
+			return false
+		end
+
+		local spellfile = require("spellfile_nvim")
+		assert.is_false(spellfile.exists("en"))
+	end)
 end)

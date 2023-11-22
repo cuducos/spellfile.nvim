@@ -1,0 +1,16 @@
+describe("Is file function", function()
+	it("returns true when the path is a file", function()
+		local path = require("spellfile_nvim.path")
+		assert.is_true(path.is_file("tests/path_spec.lua"))
+	end)
+
+	it("returns false when the path is a directory", function()
+		local path = require("spellfile_nvim.path")
+		assert.is_false(path.is_file("tests/"))
+	end)
+
+	it("returns false when the path does not exist", function()
+		local path = require("spellfile_nvim.path")
+		assert.is_false(path.is_file("tests/path_spec.sun"))
+	end)
+end)
