@@ -1,24 +1,13 @@
--- TODO: wrap in a autocmd SpellFileMissing
-
 local M = {}
-M.config = { url = "https://ftp.nluug.nl/pub/vim/runtime/spell" }
+M.config = {
+	url = "https://ftp.nluug.nl/pub/vim/runtime/spell",
+	encoding = "utf-8",
+}
 M.done = {}
 
 M.setup = function(opts)
 	M.config = vim.tbl_extend("force", M.config, opts or {})
 	M.done = {}
-end
-
-M.load_file = function(lang)
-	local code = lang:lower()
-	for key, _ in pairs(M.done) do
-		if key == code then
-			vim.notify("Already tried this language before: " .. code)
-			return
-		end
-	end
-
-	M.done[code] = true
 end
 
 M.directory_choices = function()
@@ -32,4 +21,28 @@ M.directory_choices = function()
 	return options
 end
 
+M.file_name = function(lang)
+	local encoding = vim.bo.fileencoding or vim.o.encoding
+	if encoding == "" then
+		encoding = M.config.encoding
+	end
+	if encoding == "iso-8859-1" then
+		encoding = "latin1"
+	end
+	return lang:lower() .. "." .. encoding .. ".spl"
+end
+
+M.load_file = function(lang)
+	local file_name = M.file_name(lang)
+	for key, _ in pairs(M.done) do
+		if key == file_name then
+			vim.notify("Already tried this language before: " .. lang:lower())
+			return
+		end
+	end
+
+	M.done[file_name] = true
+end
+
+-- TODO: wrap in a autocmd SpellFileMissing
 return M

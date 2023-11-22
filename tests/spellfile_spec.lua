@@ -17,17 +17,18 @@ describe("Load file", function()
 	it("adds current language to the done table", function()
 		local spellfile = require("spellfile_nvim")
 		spellfile.load_file("en")
-		assert.are.same(spellfile.done, { en = true })
+		assert.are.same(spellfile.done, { ["en.utf-8.spl"] = true })
 	end)
 
 	it("does not retry a language", function()
+		vim.o.encoding = "utf-8"
 		local spellfile = require("spellfile_nvim")
-		spellfile.done["en"] = true
+		spellfile.done["en.utf-8.spl"] = true
 
 		local notify = stub(vim, "notify")
 		spellfile.load_file("En")
 		assert.stub(notify).was_called_with("Already tried this language before: en")
-		assert.are.same(spellfile.done, { en = true })
+		assert.are.same(spellfile.done, { ["en.utf-8.spl"] = true })
 	end)
 end)
 
@@ -36,5 +37,13 @@ describe("Directory choices function", function()
 		local spellfile = require("spellfile_nvim")
 		local choices = spellfile.directory_choices()
 		assert.is_true(#choices >= 1)
+	end)
+end)
+
+describe("File name", function()
+	it("returns the correct file name", function()
+		local spellfile = require("spellfile_nvim")
+		local file_name = spellfile.file_name("en")
+		assert.are.same(file_name, "en.utf-8.spl")
 	end)
 end)
