@@ -1,6 +1,10 @@
 local stub = require("luassert.stub")
 
 describe("Setup", function()
+	after_each(function()
+		package.loaded["spellfile_nvim"] = nil
+	end)
+
 	it("loads with default config", function()
 		local spellfile = require("spellfile_nvim")
 		assert.are.same(spellfile.config.url, "https://ftp.nluug.nl/pub/vim/runtime/spell")
@@ -40,11 +44,23 @@ describe("Directory choices function", function()
 	end)
 end)
 
-describe("File name", function()
+describe("Parse", function()
+	it("returns the correct encoding", function()
+		local spellfile = require("spellfile_nvim")
+		local data = spellfile.parse("en")
+		assert.are.same(data.encoding, "utf-8")
+	end)
+
+	it("returns the correct language code", function()
+		local spellfile = require("spellfile_nvim")
+		local data = spellfile.parse("EN")
+		assert.are.same(data.lang, "en")
+	end)
+
 	it("returns the correct file name", function()
 		local spellfile = require("spellfile_nvim")
-		local file_name = spellfile.file_name("en")
-		assert.are.same(file_name, "en.utf-8.spl")
+		local data = spellfile.parse("en")
+		assert.are.same(data.file_name, "en.utf-8.spl")
 	end)
 end)
 
@@ -67,5 +83,102 @@ describe("Exists function", function()
 
 		local spellfile = require("spellfile_nvim")
 		assert.is_false(spellfile.exists("en"))
+	end)
+end)
+
+describe("Download", function()
+	it("downloads the file using curl", function()
+		local spellfile = require("spellfile_nvim")
+
+		local notify = stub(vim, "notify")
+		local system = stub(vim.fn, "system")
+		spellfile.directory_choices = function()
+			return { "/tmp" }
+		end
+		vim.fn.executable = function(name)
+			if name == "curl" then
+				return 1
+			end
+			return 0
+		end
+
+		spellfile.download("en")
+		assert.stub(notify).was_called_with("Downloading en...")
+		assert
+			.stub(system)
+			.was_called_with("curl -fLo /tmp/en.utf-8.spl https://ftp.nluug.nl/pub/vim/runtime/spell/en.utf-8.spl")
+	end)
+
+	it("downloads the file using wget", function()
+		local spellfile = require("spellfile_nvim")
+
+		local notify = stub(vim, "notify")
+		local system = stub(vim.fn, "system")
+		spellfile.directory_choices = function()
+			return { "/tmp" }
+		end
+		vim.fn.executable = function(name)
+			if name == "wget" then
+				return 1
+			end
+			return 0
+		end
+
+		spellfile.download("en")
+		assert.stub(notify).was_called_with("Downloading en...")
+		assert
+			.stub(system)
+			.was_called_with("wget -O /tmp/en.utf-8.spl https://ftp.nluug.nl/pub/vim/runtime/spell/en.utf-8.spl")
+	end)
+
+	it("shows error when there is no curl or wget", function()
+		local spellfile = require("spellfile_nvim")
+
+		local notify = stub(vim, "notify")
+		local system = stub(vim.fn, "system")
+		spellfile.directory_choices = function()
+			return { "/tmp" }
+		end
+		vim.fn.executable = function(name)
+			return 0
+		end
+
+		spellfile.download("en")
+		assert.stub(notify).was_called_with("No curl or wget found. Please install one of them.")
+		assert.stub(system).was_not_called()
+	end)
+
+	it("asks for confirmation and cancels if user does not confirm", function()
+		local spellfile = require("spellfile_nvim")
+
+		local notify = stub(vim, "notify")
+		local system = stub(vim.fn, "system")
+		vim.fn.input = function()
+			return "n"
+		end
+
+		spellfile.download("en", true)
+		assert.stub(notify).was_not_called()
+		assert.stub(system).was_not_called()
+	end)
+
+	it("asks for confirmation and proceeds if user confirms", function()
+		local spellfile = require("spellfile_nvim")
+
+		local notify = stub(vim, "notify")
+		local system = stub(vim.fn, "system")
+		vim.fn.input = function()
+			return "n"
+		end
+		spellfile.directory_choices = function()
+			return { "/tmp" }
+		end
+		vim.fn.executable = function(name)
+			return 0
+		end
+
+		spellfile.download("en")
+		assert.stub(notify).was_called_with("No curl or wget found. Please install one of them.")
+		assert.stub(system).was_not_called()
 	end)
 end)
