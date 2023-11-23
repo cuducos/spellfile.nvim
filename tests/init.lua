@@ -1,3 +1,6 @@
+vim.g.loaded_netrwPlugin = 1 -- disables netrw
+vim.o.encoding = "utf-8"
+
 -- install spellfile.nvim
 vim.opt.rtp:append(vim.fn.expand("."))
 vim.cmd("runtime plugin/spellfile.nvim")

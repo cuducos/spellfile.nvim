@@ -4,19 +4,20 @@ local M = {}
 
 M.config = {
 	url = "https://ftp.nluug.nl/pub/vim/runtime/spell",
-	encoding = "utf-8",
+	encoding = vim.o.encoding,
+	rtp = vim.opt.rtp:get(),
 }
 
 M.done = {}
 
 M.setup = function(opts)
-	M.config = vim.tbl_extend("force", M.config, opts or {})
 	M.done = {}
+	M.config = vim.tbl_extend("force", M.config, opts or {})
 end
 
 M.directory_choices = function()
 	local options = {}
-	for _, dir in ipairs(vim.opt.rtp:get()) do
+	for _, dir in ipairs(M.config.rtp) do
 		local spell = dir .. "/spell"
 		if vim.fn.isdirectory(spell) == 1 then
 			table.insert(options, spell)
@@ -49,7 +50,7 @@ end
 M.parse = function(lang)
 	local code = lang:lower()
 
-	local encoding = vim.bo.fileencoding or vim.o.encoding
+	local encoding = vim.bo.fileencoding
 	if encoding == "" then
 		encoding = M.config.encoding
 	end
@@ -64,41 +65,28 @@ M.parse = function(lang)
 	}
 end
 
-M.exists = function(lang)
-	local name = M.parse(lang).file_name
+M.exists = function(file_name)
 	for _, dir in pairs(M.directory_choices()) do
-		if path.is_file(dir .. "/" .. name) then
+		if path.is_file(dir .. "/" .. file_name) then
 			return true
 		end
 	end
 	return false
 end
 
-M.load_file = function(lang)
-	local file_name = M.parse(lang).file_name
-	for key, _ in pairs(M.done) do
-		if key == file_name then
-			vim.notify("Already tried this language before: " .. lang:lower())
-			return
-		end
+M.download = function(data)
+	local prompt = string.format("No spell file found for %s in %s. Download it? [y/N] ", data.lang, data.encoding)
+	if vim.fn.input(prompt):lower() ~= "y" then
+		return
 	end
 
-	M.done[file_name] = true
-end
-
-M.download = function(lang, should_confirm)
-	local data = M.parse(lang)
-	if should_confirm == true then
-		local prompt = string.format("No spell file found for %s in %s. Download it? [y/N] ", data.lang, data.encoding)
-		if vim.fn.input(prompt):lower() ~= "y" then
-			return
-		end
+	local dir = M.choose_directory()
+	if dir == nil then
+		return
 	end
 
 	local url = M.config.url .. "/" .. data.file_name
-	local dir = M.directory_choices()[1]
 	local pth = dir .. "/" .. data.file_name
-
 	local cmd = ""
 	if vim.fn.executable("curl") == 1 then
 		cmd = string.format("curl -fLo %s %s", pth, url)
@@ -109,9 +97,25 @@ M.download = function(lang, should_confirm)
 		return
 	end
 
-	vim.notify("Downloading " .. lang:lower() .. "...")
+	vim.notify(string.format("\nDownloading %s...", data.lang))
 	vim.fn.system(cmd)
 end
 
--- TODO: wrap in a autocmd SpellFileMissing
+M.load_file = function(lang)
+	local data = M.parse(lang)
+	if M.exists(data.file_name) then
+		return
+	end
+
+	for key, _ in pairs(M.done) do
+		if key == data.file_name then
+			vim.notify("Already tried this language before: " .. lang:lower())
+			return
+		end
+	end
+
+	M.download(data)
+	M.done[data.file_name] = true
+end
+
 return M
