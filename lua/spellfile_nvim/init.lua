@@ -25,6 +25,27 @@ M.directory_choices = function()
 	return options
 end
 
+M.choose_directory = function()
+	local options = M.directory_choices()
+	if #options == 0 then
+		vim.notify("No spell directory found in the runtimepath")
+		return
+	elseif #options == 1 then
+		return options[1]
+	end
+
+	local prompt = {}
+	for idx, dir in pairs(options) do
+		table.insert(prompt, string.format("%d: %s", idx, dir))
+	end
+	local choice = vim.fn.inputlist(prompt)
+	if choice <= 0 or choice > #options then
+		return
+	end
+
+	return options[choice]
+end
+
 M.parse = function(lang)
 	local code = lang:lower()
 

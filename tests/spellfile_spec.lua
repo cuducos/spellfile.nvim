@@ -182,3 +182,52 @@ describe("Download", function()
 		assert.stub(system).was_not_called()
 	end)
 end)
+
+describe("Choose directory", function()
+	it("shows notification when there are no directories", function()
+		local spellfile = require("spellfile_nvim")
+		spellfile.directory_choices = function()
+			return {}
+		end
+
+		local notify = stub(vim, "notify")
+		assert.is_nil(spellfile.choose_directory())
+		assert.stub(notify).was_called_with("No spell directory found in the runtimepath")
+	end)
+
+	it("returns the first directory when there is only one", function()
+		local spellfile = require("spellfile_nvim")
+		spellfile.directory_choices = function()
+			return { "/tmp" }
+		end
+
+		local choice = spellfile.choose_directory()
+		assert.are.same(choice, "/tmp")
+	end)
+
+	it("asks for user input when there are multiple directories", function()
+		local spellfile = require("spellfile_nvim")
+
+		spellfile.directory_choices = function()
+			return { "/tmp/1", "/tmp2" }
+		end
+		vim.fn.inputlist = function()
+			return 1
+		end
+
+		assert.are.same("/tmp/1", spellfile.choose_directory())
+	end)
+
+	it("returns nil when user chooses a non-existent option", function()
+		local spellfile = require("spellfile_nvim")
+
+		spellfile.directory_choices = function()
+			return { "/tmp/1", "/tmp2" }
+		end
+		vim.fn.inputlist = function()
+			return 42
+		end
+
+		assert.is_nil(spellfile.choose_directory())
+	end)
+end)
