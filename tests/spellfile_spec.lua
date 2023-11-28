@@ -86,21 +86,29 @@ end)
 describe("Exists function", function()
 	before_each(function()
 		local spellfile = require("spellfile_nvim")
-		local path = require("spellfile_nvim.path")
 
 		spellfile.config.rtp = { "/tmp" }
-		path.is_file = function(pth)
-			return pth == "/tmp/spell/en.utf-8.spl"
+		vim.loop.fs_stat = function(pth)
+			if pth == "/tmp/spell/en.utf-8.spl" then
+				return { type = "file" }
+			end
+			return nil
 		end
 	end)
 
 	it("returns true when the spell file exists", function()
 		local spellfile = require("spellfile_nvim")
+		vim.loop.fs_stat = function()
+			return { type = "file" }
+		end
 		assert.is_true(spellfile.exists("en.utf-8.spl"))
 	end)
 
 	it("returns false when the spell file exists", function()
 		local spellfile = require("spellfile_nvim")
+		vim.loop.fs_stat = function()
+			return nil
+		end
 		assert.is_false(spellfile.exists("en.utf-42.spl"))
 	end)
 end)
