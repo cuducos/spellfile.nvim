@@ -92,6 +92,13 @@ describe('Parse', function()
     local data = spellfile.parse('en')
     assert.are.same({ 'en.utf-8.spl' }, data.files)
   end)
+
+  it('discards variation/region keeping only the language code', function()
+    local spellfile = require('spellfile_nvim')
+    local data = spellfile.parse('en_US')
+    assert.are.same('en', data.lang)
+    assert.are.same({ 'en.utf-8.spl' }, data.files)
+  end)
 end)
 
 describe('Exists function', function()

@@ -60,7 +60,7 @@ M.exists = function(file_name)
 end
 
 M.parse = function(lang)
-  local code = lang:lower()
+  local code = string.sub(lang:lower(), 1, 2)
 
   local encoding = vim.bo.fileencoding
   if encoding == '' then
