@@ -32,17 +32,17 @@ describe('Load file', function()
   it('adds current language to the done table', function()
     local spellfile = require('spellfile_nvim')
     spellfile.load_file('en')
-    assert.are.same({ ['en.utf-8.spl'] = true }, spellfile.done)
+    assert.are.same({ ['en.utf-8'] = true }, spellfile.done)
   end)
 
   it('does not retry a language', function()
     local spellfile = require('spellfile_nvim')
-    spellfile.done['en.utf-8.spl'] = true
+    spellfile.done['en.utf-8'] = true
 
     local notify = stub(vim, 'notify')
     spellfile.load_file('En')
     assert.stub(notify).was_called_with('Already tried this language before: en')
-    assert.are.same({ ['en.utf-8.spl'] = true }, spellfile.done)
+    assert.are.same({ ['en.utf-8'] = true }, spellfile.done)
   end)
 end)
 
@@ -64,6 +64,17 @@ describe('Directory choices function', function()
 end)
 
 describe('Parse', function()
+  before_each(function()
+    local spellfile = require('spellfile_nvim')
+    spellfile.config.rtp = { '/tmp' }
+    vim.loop.fs_stat = function(pth)
+      if pth == '/tmp/spell/en.utf-8.sug' then
+        return { type = 'file' }
+      end
+      return nil
+    end
+  end)
+
   it('returns the correct encoding', function()
     local spellfile = require('spellfile_nvim')
     local data = spellfile.parse('en')
@@ -79,7 +90,7 @@ describe('Parse', function()
   it('returns the correct file name', function()
     local spellfile = require('spellfile_nvim')
     local data = spellfile.parse('en')
-    assert.are.same('en.utf-8.spl', data.file_name)
+    assert.are.same({ 'en.utf-8.spl' }, data.files)
   end)
 end)
 
@@ -134,8 +145,13 @@ describe('Download', function()
       return 0
     end
 
-    spellfile.download(spellfile.parse('en'))
-    assert.stub(notify).was_called_with('\nDownloading en...')
+    local data = {
+      files = { 'en.utf-8.spl' },
+      lang = 'en',
+      encoding = 'utf-8',
+    }
+    spellfile.download(data)
+    assert.stub(notify).was_called_with('\nDownloading en.utf-8.spl...')
     assert
       .stub(system)
       .was_called_with('curl -fLo /tmp/spell/en.utf-8.spl https://ftp.nluug.nl/pub/vim/runtime/spell/en.utf-8.spl')
@@ -153,8 +169,13 @@ describe('Download', function()
       return 0
     end
 
-    spellfile.download(spellfile.parse('en'))
-    assert.stub(notify).was_called_with('\nDownloading en...')
+    local data = {
+      files = { 'en.utf-8.spl' },
+      lang = 'en',
+      encoding = 'utf-8',
+    }
+    spellfile.download(data)
+    assert.stub(notify).was_called_with('\nDownloading en.utf-8.spl...')
     assert
       .stub(system)
       .was_called_with('wget -O /tmp/spell/en.utf-8.spl https://ftp.nluug.nl/pub/vim/runtime/spell/en.utf-8.spl')
@@ -169,7 +190,12 @@ describe('Download', function()
       return 0
     end
 
-    spellfile.download(spellfile.parse('en'))
+    local data = {
+      files = { 'en.utf-8.spl' },
+      lang = 'en',
+      encoding = 'utf-8',
+    }
+    spellfile.download(data)
     assert.stub(notify).was_called_with('No curl or wget found. Please install one of them.')
     assert.stub(system).was_not_called()
   end)
@@ -183,7 +209,12 @@ describe('Download', function()
       return 'n'
     end
 
-    spellfile.download('en', true)
+    local data = {
+      files = { 'en.utf-8.spl' },
+      lang = 'en',
+      encoding = 'utf-8',
+    }
+    spellfile.download(data)
     assert.stub(notify).was_not_called()
     assert.stub(system).was_not_called()
   end)
@@ -197,7 +228,12 @@ describe('Download', function()
       return 0
     end
 
-    spellfile.download(spellfile.parse('en'))
+    local data = {
+      files = { 'en.utf-8.spl' },
+      lang = 'en',
+      encoding = 'utf-8',
+    }
+    spellfile.download(data)
     assert.stub(notify).was_called_with('No curl or wget found. Please install one of them.')
     assert.stub(system).was_not_called()
   end)
