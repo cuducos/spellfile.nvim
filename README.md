@@ -8,7 +8,7 @@ It looks like that nice feature of Vim/Neovim that automatically downloads missi
 * There's [an issue on Neovim](https://github.com/neovim/neovim/issues/7189)
 * And there's [this](https://github.com/neovim/neovim/blob/7e97c773e3ba78fcddbb2a0b9b0d572c8210c83e/runtime/autoload/spellfile.vim#L19) on native's `spellfile.vim`
 
-Native `spellfile.vim` works [using a `SpellFileMissing` auto command](https://github.com/neovim/neovim/blob/7e97c773e3ba78fcddbb2a0b9b0d572c8210c83e/runtime/doc/spell.txt#L657-L658), and:
+Native `spellfile.vim` works [using a `SpellFileMissing` auto command](https://github.com/neovim/neovim/blob/7e97c773e3ba78fcddbb2a0b9b0d572c8210c83e/runtime/doc/spell.txt#L657-L658), and `spellfile.nvim`:
 * has no other dependency than Neovim
 * uses the same `autocmd` for seamless integration
 
@@ -18,7 +18,7 @@ You can see it working (without changing your config) by cloning this repo and:
 $ nvim -u tests/init.lua
 ```
 
-From there, try setting a lanaguide that is not installed, e.g. `:set spell spelllang=pt`.
+From there, try setting a language that is not installed, e.g. `:set spell spelllang=pt`.
 
 ## Install
 
