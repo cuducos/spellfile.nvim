@@ -1,3 +1,6 @@
+> [!NOTE]
+> This project is not needed anymore, see https://github.com/neovim/neovim/pull/34940
+
 # `spellfile.nvim` [![Tests](https://github.com/cuducos/spellfile.nvim/actions/workflows/tests.yml/badge.svg)](https://github.com/cuducos/spellfile.nvim/actions/workflows/tests.yml) [![StyLua](https://github.com/cuducos/spellfile.nvim/actions/workflows/stylua.yml/badge.svg)](https://github.com/cuducos/spellfile.nvim/actions/workflows/stylua.yml)
 
 Alternative for Vim's native `spellfile.vim` written in Lua and with no dependency on `netrw`.
